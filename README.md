@@ -6,6 +6,11 @@
 [![Platform](https://img.shields.io/cocoapods/p/KZLog.svg?style=flat)](https://cocoapods.org/pods/KZLog)
 
 
+## Description
+
+Collect and sync all logs to QiNiu Cloud
+
+
 ## Installation
 
 pod 'KZLog', :git => 'https://github.com/KhazanGu/KZLog.git'
