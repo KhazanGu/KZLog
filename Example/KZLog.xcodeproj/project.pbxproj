@@ -40,7 +40,7 @@
 		0C6372B39B1ABDC311A931EF /* Pods-KZLog_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KZLog_Example.release.xcconfig"; path = "Target Support Files/Pods-KZLog_Example/Pods-KZLog_Example.release.xcconfig"; sourceTree = "<group>"; };
 		2CBAD367ED660C22FE29E2FC /* Pods_KZLog_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KZLog_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3188FF09742EF7C5E5742460 /* Pods-KZLog_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KZLog_Tests.release.xcconfig"; path = "Target Support Files/Pods-KZLog_Tests/Pods-KZLog_Tests.release.xcconfig"; sourceTree = "<group>"; };
-		3677BBB230CE918F9CD02D43 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		3677BBB230CE918F9CD02D43 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* KZLog_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KZLog_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -63,8 +63,8 @@
 		71719F9E1E33DC2100824A3D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Main.storyboard; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8A24C82491FB58A904014C82 /* Pods_KZLog_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KZLog_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		AC0DC0E0471D1658A5C6A4D2 /* KZLog.podspec */ = {isa = PBXFileReference; includeInIndex = 1; name = KZLog.podspec; path = ../KZLog.podspec; sourceTree = "<group>"; };
-		B6063FF69E084ACB22542144 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		AC0DC0E0471D1658A5C6A4D2 /* KZLog.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = KZLog.podspec; path = ../KZLog.podspec; sourceTree = "<group>"; };
+		B6063FF69E084ACB22542144 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		E50A02181C3B6B9D7E80670F /* Pods-KZLog_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KZLog_Example.debug.xcconfig"; path = "Target Support Files/Pods-KZLog_Example/Pods-KZLog_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		EC0D3A75978EF5221A6016B9 /* Pods-KZLog_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KZLog_Tests.debug.xcconfig"; path = "Target Support Files/Pods-KZLog_Tests/Pods-KZLog_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -103,7 +103,6 @@
 				EC0D3A75978EF5221A6016B9 /* Pods-KZLog_Tests.debug.xcconfig */,
 				3188FF09742EF7C5E5742460 /* Pods-KZLog_Tests.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -208,7 +207,7 @@
 				6003F586195388D20070C39A /* Sources */,
 				6003F587195388D20070C39A /* Frameworks */,
 				6003F588195388D20070C39A /* Resources */,
-				FFF10F32BA1F952B0D23AA27 /* [CP] Embed Pods Frameworks */,
+				EE137897A8938D57161A520C /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -248,6 +247,9 @@
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = KhazanGu;
 				TargetAttributes = {
+					6003F589195388D20070C39A = {
+						DevelopmentTeam = AYDR2YFZ4K;
+					};
 					6003F5AD195388D20070C39A = {
 						TestTargetID = 6003F589195388D20070C39A;
 					};
@@ -258,6 +260,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -339,7 +342,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		FFF10F32BA1F952B0D23AA27 /* [CP] Embed Pods Frameworks */ = {
+		EE137897A8938D57161A520C /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -494,6 +497,7 @@
 			baseConfigurationReference = E50A02181C3B6B9D7E80670F /* Pods-KZLog_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = AYDR2YFZ4K;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KZLog/KZLog-Prefix.pch";
 				INFOPLIST_FILE = "KZLog/KZLog-Info.plist";
@@ -510,6 +514,7 @@
 			baseConfigurationReference = 0C6372B39B1ABDC311A931EF /* Pods-KZLog_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = AYDR2YFZ4K;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "KZLog/KZLog-Prefix.pch";
 				INFOPLIST_FILE = "KZLog/KZLog-Info.plist";

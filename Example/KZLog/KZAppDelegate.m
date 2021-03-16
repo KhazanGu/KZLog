@@ -7,12 +7,24 @@
 //
 
 #import "KZAppDelegate.h"
+#import <KZLog/KZLog.h>
 
 @implementation KZAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    
+    NSString *Host = @"";
+    NSString *bucket = @"";
+    NSString *accessKey = @"";
+    NSString *secretKey = @"";
+
+    [[KZLog sharedInstance] syncAllLogsToQiNiuWithHost:Host
+                                                bucket:bucket
+                                             accessKey:accessKey
+                                             secretKey:secretKey];
+    
     return YES;
 }
 

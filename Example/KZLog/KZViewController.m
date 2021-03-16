@@ -14,6 +14,14 @@
 
 @implementation KZViewController
 
+- (IBAction)debug:(id)sender {
+    
+    for (int i = 1000000; i<1050000; i++) {
+        NSLog(@"%f", pow(i, 25));
+    }
+    
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
