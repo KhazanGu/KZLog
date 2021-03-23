@@ -8,7 +8,7 @@
 
 ## Description
 
-Collect and sync all logs to QiNiu Cloud
+Collect and sync logs to QiNiu Cloud
 
 
 ## Installation
