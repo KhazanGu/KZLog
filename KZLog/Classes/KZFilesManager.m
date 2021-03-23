@@ -35,8 +35,8 @@
     for (NSString *curFileName in [documentsDirectoryContents objectEnumerator]) {
         
         NSString *filePath = [documentsDirectoryPath stringByAppendingPathComponent:curFileName];
-//        NSURL *fileURL = [NSURL fileURLWithPath:filePath];
-//        KZLOG(@"filePath: %@", filePath);
+        //        NSURL *fileURL = [NSURL fileURLWithPath:filePath];
+        //        KZLOG(@"filePath: %@", filePath);
         
         BOOL isDirectory;
         [[NSFileManager defaultManager] fileExistsAtPath:filePath isDirectory:&isDirectory];

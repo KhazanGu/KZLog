@@ -34,7 +34,7 @@
     NSData *hmac = [self hmac_sha1WithEncodedPutPolicy:encodedPutPolicy secretKey:secretKey];
     NSString *encodedSign = [self urlsafe_base64_encodeWithHmac:hmac];
     NSString *uploadToken = [self uploadTokenWithAccessKey:accessKey encodedSign:encodedSign encodedPutPolicy:encodedPutPolicy];
-//    KZLOG(@"qiniu uploadToken:%@", uploadToken);
+    //    KZLOG(@"qiniu uploadToken:%@", uploadToken);
     return uploadToken;
 }
 
@@ -47,7 +47,7 @@
         @"deadline": deadline
     };
     
-//    KZLOG(@"putPolicy:%@", putPolicy);
+    //    KZLOG(@"putPolicy:%@", putPolicy);
     return putPolicy;
 }
 
@@ -63,7 +63,7 @@
     NSString *urlsafe_base64String = [base64String stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     urlsafe_base64String = [urlsafe_base64String stringByReplacingOccurrencesOfString:@"+" withString:@"-"];
     
-//    KZLOG(@"urlsafe_base64_encodeWithPutPolicy \ndata:%@ \nbase64String:%@ \nresult:%@", data, base64String, urlsafe_base64String);
+    //    KZLOG(@"urlsafe_base64_encodeWithPutPolicy \ndata:%@ \nbase64String:%@ \nresult:%@", data, base64String, urlsafe_base64String);
     return urlsafe_base64String;
 }
 
@@ -84,13 +84,13 @@
     // url safe
     NSString *urlsafe_base64String = [base64String stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     urlsafe_base64String = [urlsafe_base64String stringByReplacingOccurrencesOfString:@"+" withString:@"-"];
-//    KZLOG(@"urlsafe_base64_encodeWithSign:%@", urlsafe_base64String);
+    //    KZLOG(@"urlsafe_base64_encodeWithSign:%@", urlsafe_base64String);
     return urlsafe_base64String;
 }
 
 - (NSString *)uploadTokenWithAccessKey:(NSString *)AccessKey encodedSign:(NSString *)encodedSign encodedPutPolicy:(NSString *)encodedPutPolicy {
     NSString *uploadToken = [NSString stringWithFormat:@"%@:%@:%@", AccessKey, encodedSign, encodedPutPolicy];
-//    KZLOG(@"uploadToken:%@", uploadToken);
+    //    KZLOG(@"uploadToken:%@", uploadToken);
     return uploadToken;
 }
 

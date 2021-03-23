@@ -11,30 +11,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KZUploadViaDataSplit : NSObject
 
-# pragma mark - splite data and upload subdata - big memory use
+# pragma mark - split data and upload subdata - big memory use
 
-- (void)spliteDataAndUploadWithData:(NSData *)data
-                          chunkSize:(NSUInteger)chunkSize
-                           fileName:(NSString *)fileName
-                               host:(NSString *)host
-                             bucket:(NSString *)bucket
-                          accessKey:(NSString *)accessKey
-                          secretKey:(NSString *)secretKey
-                            success:(void (^)(void))success
-                            failure:(void (^)(void))failure;
+- (void)splitDataAndUploadWithData:(NSData *)data
+                         chunkSize:(NSUInteger)chunkSize
+                          fileName:(NSString *)fileName
+                              host:(NSString *)host
+                            bucket:(NSString *)bucket
+                         accessKey:(NSString *)accessKey
+                         secretKey:(NSString *)secretKey
+                           success:(void (^)(void))success
+                           failure:(void (^)(void))failure;
 
 
-# pragma mark - splite data and upload subdata - little memory use
+# pragma mark - read and upload file in partial - little memory use
 
-- (void)spliteDataAndUploadWithFilePath:(NSString *)filePath
-                              chunkSize:(NSUInteger)chunkSize
-                               fileName:(NSString *)fileName
-                                   host:(NSString *)host
-                                 bucket:(NSString *)bucket
-                              accessKey:(NSString *)accessKey
-                              secretKey:(NSString *)secretKey
-                                success:(void (^)(void))success
-                                failure:(void (^)(void))failure;
+- (void)readAndUploadFileInPartialWithFilePath:(NSString *)filePath
+                                     chunkSize:(NSUInteger)chunkSize
+                                      fileName:(NSString *)fileName
+                                          host:(NSString *)host
+                                        bucket:(NSString *)bucket
+                                     accessKey:(NSString *)accessKey
+                                     secretKey:(NSString *)secretKey
+                                       success:(void (^)(void))success
+                                       failure:(void (^)(void))failure;
 
 
 @end

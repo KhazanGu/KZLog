@@ -17,29 +17,55 @@
 
 @implementation KZUploadViaDataSplit
 
+# pragma mark - split data and upload subdata - big memory use
 
-# pragma mark - splite data and upload subdata - big memory use
-
-- (void)spliteDataAndUploadWithData:(NSData *)data
-                          chunkSize:(NSUInteger)chunkSize
-                           fileName:(NSString *)fileName
-                               host:(NSString *)host
-                             bucket:(NSString *)bucket
-                          accessKey:(NSString *)accessKey
-                          secretKey:(NSString *)secretKey
-                            success:(void (^)(void))success
-                            failure:(void (^)(void))failure {
+- (void)splitDataAndUploadWithData:(NSData *)data
+                         chunkSize:(NSUInteger)chunkSize
+                          fileName:(NSString *)fileName
+                              host:(NSString *)host
+                            bucket:(NSString *)bucket
+                         accessKey:(NSString *)accessKey
+                         secretKey:(NSString *)secretKey
+                           success:(void (^)(void))success
+                           failure:(void (^)(void))failure {
     
-    KZLOG(@"splite Data:%.0f", data.length/1024.0/1024.0);
+    KZLOG(@"split Data:%.0f", data.length/1024.0/1024.0);
     
     if (data.length == 0) {
         success ? success() : nil;
         return;
     }
     
-    NSString *uploadToken = [KZUploadToken tokenWithBucket:bucket fileName:fileName accessKey:accessKey secretKey:secretKey];
+    NSString *uploadToken = [KZUploadToken tokenWithBucket:bucket
+                                                  fileName:fileName
+                                                 accessKey:accessKey
+                                                 secretKey:secretKey];
     NSString *fileNameBase64 = [[fileName dataUsingEncoding:NSUTF8StringEncoding] base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithCarriageReturn];
     
+    [self splitDataAndUploadCreateUploadTaskWithHost:host
+                                              bucket:bucket
+                                           accessKey:accessKey
+                                           secretKey:secretKey
+                                         uploadToken:uploadToken
+                                            fileName:fileName
+                                      fileNameBase64:fileNameBase64
+                                                data:data
+                                           chunkSize:chunkSize
+                                             success:success
+                                             failure:failure];
+}
+
+- (void)splitDataAndUploadCreateUploadTaskWithHost:(NSString *)host
+                                            bucket:(NSString *)bucket
+                                         accessKey:(NSString *)accessKey
+                                         secretKey:(NSString *)secretKey
+                                       uploadToken:(NSString *)uploadToken
+                                          fileName:(NSString *)fileName
+                                    fileNameBase64:(NSString *)fileNameBase64
+                                              data:(NSData *)data
+                                         chunkSize:(NSUInteger)chunkSize
+                                           success:(void (^)(void))success
+                                           failure:(void (^)(void))failure {
     __weak typeof(self) weakSelf = self;
     
     [self createUploadTaskWithHost:host
@@ -53,35 +79,94 @@
         
         NSString *uploadId = [responseObject objectForKey:@"uploadId"];
         
-        [weakSelf splitData:data
-                  chunkSize:chunkSize
-             uploadWithHost:host
-                     bucket:bucket
-             fileNameBase64:fileNameBase64
-                   uploadId:uploadId
-                uploadToken:uploadToken
-                    success: success
-                    failure:failure];
+        [weakSelf splitDataAndUploadTaskWithData:data
+                                       chunkSize:chunkSize
+                                            host:host
+                                          bucket:bucket
+                                  fileNameBase64:fileNameBase64
+                                        uploadId:uploadId
+                                     uploadToken:uploadToken
+                                         success:success
+                                         failure:failure];
         
+    } failure:^(NSError *error) {
+        failure ? failure() : nil;
+    }];
+    
+}
+
+- (void)splitDataAndUploadTaskWithData:(NSData *)data
+                             chunkSize:(NSUInteger)chunkSize
+                                  host:(NSString *)host
+                                bucket:(NSString *)bucket
+                        fileNameBase64:(NSString *)fileNameBase64
+                              uploadId:(NSString *)uploadId
+                           uploadToken:(NSString *)uploadToken
+                               success:(void (^)(void))success
+                               failure:(void (^)(void))failure {
+    
+    __weak typeof(self) weakSelf = self;
+    
+    [self splitAndUploadData:data
+                   chunkSize:chunkSize
+              uploadWithHost:host
+                      bucket:bucket
+              fileNameBase64:fileNameBase64
+                    uploadId:uploadId
+                 uploadToken:uploadToken
+                     success:^(NSArray *parts) {
+        
+        [weakSelf splitDataAndUploadEndUploadTaskWithHost:host
+                                                   bucket:bucket
+                                           fileNameBase64:fileNameBase64
+                                                 uploadId:uploadId
+                                              uploadToken:uploadToken
+                                                    parts:parts
+                                                  success:success
+                                                  failure:failure];
+        
+    } failure:failure];
+}
+
+- (void)splitDataAndUploadEndUploadTaskWithHost:(NSString *)host
+                                         bucket:(NSString *)bucket
+                                 fileNameBase64:(NSString *)fileNameBase64
+                                       uploadId:(NSString *)uploadId
+                                    uploadToken:(NSString *)uploadToken
+                                          parts:(NSArray *)parts
+                                        success:(void (^)(void))success
+                                        failure:(void (^)(void))failure {
+    
+    [self endUploadTaskWithHost:host
+                         bucket:bucket
+                 fileNameBase64:fileNameBase64
+                       uploadId:uploadId
+                    uploadToken:uploadToken
+                          parts:parts
+                        success:^(NSDictionary *responseObject) {
+        success ? success() : nil;
     }
-                           failure:^(NSError *error) {
+                        failure:^(NSError *error) {
         failure ? failure() : nil;
     }];
 }
 
-# pragma mark - splite data and upload subdata - little memory use
 
-- (void)spliteDataAndUploadWithFilePath:(NSString *)filePath
-                              chunkSize:(NSUInteger)chunkSize
-                               fileName:(NSString *)fileName
-                                   host:(NSString *)host
-                                 bucket:(NSString *)bucket
-                              accessKey:(NSString *)accessKey
-                              secretKey:(NSString *)secretKey
-                                success:(void (^)(void))success
-                                failure:(void (^)(void))failure {
+# pragma mark - read and upload file in partial - little memory use
+
+- (void)readAndUploadFileInPartialWithFilePath:(NSString *)filePath
+                                     chunkSize:(NSUInteger)chunkSize
+                                      fileName:(NSString *)fileName
+                                          host:(NSString *)host
+                                        bucket:(NSString *)bucket
+                                     accessKey:(NSString *)accessKey
+                                     secretKey:(NSString *)secretKey
+                                       success:(void (^)(void))success
+                                       failure:(void (^)(void))failure {
     
     unsigned long long fileSize = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil] fileSize];
+    
+    KZLOG(@"split Data:%.0f", fileSize/1024.0/1024.0);
     
     if (fileSize == 0) {
         success ? success() : nil;
@@ -93,7 +178,33 @@
                                                  accessKey:accessKey
                                                  secretKey:secretKey];
     NSString *fileNameBase64 = [[fileName dataUsingEncoding:NSUTF8StringEncoding] base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithCarriageReturn];
-    NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath:filePath];
+    
+    
+    [self readAndUploadFileInPartialCreateTaskWithHost:host
+                                                bucket:bucket
+                                             accessKey:accessKey
+                                             secretKey:secretKey
+                                           uploadToken:uploadToken
+                                              fileName:fileName
+                                        fileNameBase64:fileNameBase64
+                                              filePath:filePath
+                                             chunkSize:chunkSize
+                                               success:success
+                                               failure:failure];
+}
+
+- (void)readAndUploadFileInPartialCreateTaskWithHost:host
+                                              bucket:bucket
+                                           accessKey:accessKey
+                                           secretKey:secretKey
+                                         uploadToken:uploadToken
+                                            fileName:fileName
+                                      fileNameBase64:fileNameBase64
+                                            filePath:(NSString *)filePath
+                                           chunkSize:(NSUInteger)chunkSize
+                                             success:(void (^)(void))success
+                                             failure:(void (^)(void))failure {
+    
     __weak typeof(self) weakSelf = self;
     
     [self createUploadTaskWithHost:host
@@ -106,49 +217,101 @@
                            success:^(NSDictionary *responseObject) {
         
         NSString *uploadId = [responseObject objectForKey:@"uploadId"];
-        NSMutableArray *parts = [NSMutableArray arrayWithCapacity:0];
         
-        [weakSelf readAndUploadWithFileHandle:handle
-                                        parts:parts
-                                    chunkSize:chunkSize
-                                        index:0
-                               fileNameBase64:fileNameBase64
-                                     uploadId:uploadId
-                                  uploadToken:uploadToken
-                                         host:host
-                                       bucket:bucket
-                                    accessKey:accessKey
-                                    secretKey:secretKey
-                                      success:^(NSArray *newParts) {
-            
-            [weakSelf endUploadTaskWithHost:host
-                                     bucket:bucket
-                             fileNameBase64:fileNameBase64
-                                   uploadId:uploadId
-                                uploadToken:uploadToken
-                                      parts:newParts
-                                    success:^(NSDictionary *responseObject) {
-                success ? success() : nil;
-                [handle closeFile];
-            }
-                                    failure:^(NSError *error) {
-                failure ? failure() : nil;
-                [handle closeFile];
-            }];
-            
-        }
-                                      failure:^{
-            failure ? failure() : nil;
-            [handle closeFile];
-        }];
+        [weakSelf readAndUploadFileInPartialUploadTaskWithFilePath:filePath
+                                                         chunkSize:chunkSize
+                                                             index:0
+                                                    fileNameBase64:fileNameBase64
+                                                          uploadId:uploadId
+                                                       uploadToken:uploadToken
+                                                              host:host
+                                                            bucket:bucket
+                                                         accessKey:accessKey
+                                                         secretKey:secretKey
+                                                           success:success
+                                                           failure:failure];
+        
         
     } failure:^(NSError *error) {
-        [handle closeFile];
+        
         failure ? failure() : nil;
+        
     }];
     
 }
 
+- (void)readAndUploadFileInPartialUploadTaskWithFilePath:(NSString *)filePath
+                                               chunkSize:(NSUInteger)chunkSize
+                                                   index:(NSUInteger)index
+                                          fileNameBase64:fileNameBase64
+                                                uploadId:uploadId
+                                             uploadToken:uploadToken
+                                                    host:(NSString *)host
+                                                  bucket:(NSString *)bucket
+                                               accessKey:(NSString *)accessKey
+                                               secretKey:(NSString *)secretKey
+                                                 success:(void (^)(void))success
+                                                 failure:(void (^)(void))failure {
+    
+    NSFileHandle *fileHandle = [NSFileHandle fileHandleForReadingAtPath:filePath];
+    NSMutableArray *parts = [NSMutableArray arrayWithCapacity:0];
+    __weak typeof(self) weakSelf = self;
+    
+    [self readAndUploadFileInPartialWithFileHandle:fileHandle
+                                             parts:parts
+                                         chunkSize:chunkSize
+                                             index:0
+                                    fileNameBase64:fileNameBase64
+                                          uploadId:uploadId
+                                       uploadToken:uploadToken
+                                              host:host
+                                            bucket:bucket
+                                         accessKey:accessKey
+                                         secretKey:secretKey
+                                           success:^(NSArray *newParts) {
+        
+        [fileHandle closeFile];
+        
+        [weakSelf readAndUploadFileInPartialEndUploadTaskWithHost:host
+                                                           bucket:bucket
+                                                   fileNameBase64:fileNameBase64
+                                                         uploadId:uploadId
+                                                      uploadToken:uploadToken
+                                                            parts:newParts
+                                                          success:success
+                                                          failure:failure];
+    }
+                                           failure:^{
+        [fileHandle closeFile];
+        failure ? failure() : nil;
+    }];
+}
+
+- (void)readAndUploadFileInPartialEndUploadTaskWithHost:(NSString *)host
+                                                 bucket:(NSString *)bucket
+                                         fileNameBase64:(NSString *)fileNameBase64
+                                               uploadId:(NSString *)uploadId
+                                            uploadToken:(NSString *)uploadToken
+                                                  parts:(NSArray *)parts
+                                                success:(void (^)(void))success
+                                                failure:(void (^)(void))failure {
+    
+    [self endUploadTaskWithHost:host
+                         bucket:bucket
+                 fileNameBase64:fileNameBase64
+                       uploadId:uploadId
+                    uploadToken:uploadToken
+                          parts:parts
+                        success:^(NSDictionary *responseObject) {
+        success ? success() : nil;
+    }
+                        failure:^(NSError *error) {
+        failure ? failure() : nil;
+    }];
+}
+
+
+#pragma mark -  parts upload task
 
 // create upload task
 - (void)createUploadTaskWithHost:(NSString *)host
@@ -234,6 +397,7 @@
     [task resume];
 }
 
+
 // end upload task
 - (void)endUploadTaskWithHost:(NSString *)host
                        bucket:(NSString *)bucket
@@ -275,22 +439,23 @@
     [task resume];
 }
 
-// split data and upload at the same time
-- (void)splitData:(NSData *)data
-        chunkSize:(NSUInteger)chunkSize
-   uploadWithHost:(NSString *)host
-           bucket:(NSString *)bucket
-   fileNameBase64:(NSString *)fileNameBase64
-         uploadId:(NSString *)uploadId
-      uploadToken:(NSString *)uploadToken
-          success:(void (^)(void))success
-          failure:(void (^)(void))failure {
-    
-    NSUInteger number = data.length / chunkSize;
+
+#pragma mark - split data to parts and upload
+
+- (void)splitAndUploadData:(NSData *)data
+                 chunkSize:(NSUInteger)chunkSize
+            uploadWithHost:(NSString *)host
+                    bucket:(NSString *)bucket
+            fileNameBase64:(NSString *)fileNameBase64
+                  uploadId:(NSString *)uploadId
+               uploadToken:(NSString *)uploadToken
+                   success:(void (^)(NSArray *parts))success
+                   failure:(void (^)(void))failure {
     
     NSMutableArray *uploadSuccess = [NSMutableArray arrayWithCapacity:0];
     dispatch_group_t group = dispatch_group_create();
     
+    NSUInteger number = data.length / chunkSize;
     for (NSUInteger i = 0; i <= number; i++) {
         dispatch_group_enter(group);
         NSRange range = NSMakeRange(i * chunkSize, MIN(data.length - i * chunkSize, chunkSize));
@@ -317,44 +482,31 @@
     
     dispatch_group_notify(group, dispatch_get_main_queue(), ^{
         if (number == uploadSuccess.count - 1) {
-            
             [uploadSuccess sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
                 return [[obj1 objectForKey:@"partNumber"] unsignedIntegerValue] > [[obj2 objectForKey:@"partNumber"] unsignedIntegerValue];
             }];
-            
-            [self endUploadTaskWithHost:host
-                                 bucket:bucket
-                         fileNameBase64:fileNameBase64
-                               uploadId:uploadId
-                            uploadToken:uploadToken
-                                  parts:[uploadSuccess copy]
-                                success:^(NSDictionary *responseObject) {
-                success ? success() : nil;
-            } failure:^(NSError *error) {
-                failure ? failure() : nil;
-            }];
+            success ? success([uploadSuccess copy]) : nil;
         } else {
             failure ? failure() : nil;
         }
     });
-    
 }
 
+#pragma mark - partial file read and upload in async
 
-// read and upload a part one by one
-- (void)readAndUploadWithFileHandle:(NSFileHandle *)fileHandle
-                              parts:(NSMutableArray *)parts
-                          chunkSize:(NSUInteger)chunkSize
-                              index:(NSUInteger)index
-                     fileNameBase64:fileNameBase64
-                           uploadId:uploadId
-                        uploadToken:uploadToken
-                               host:(NSString *)host
-                             bucket:(NSString *)bucket
-                          accessKey:(NSString *)accessKey
-                          secretKey:(NSString *)secretKey
-                            success:(void (^)(NSArray *newParts))success
-                            failure:(void (^)(void))failure {
+- (void)readAndUploadFileInPartialWithFileHandle:(NSFileHandle *)fileHandle
+                                           parts:(NSMutableArray *)parts
+                                       chunkSize:(NSUInteger)chunkSize
+                                           index:(NSUInteger)index
+                                  fileNameBase64:fileNameBase64
+                                        uploadId:uploadId
+                                     uploadToken:uploadToken
+                                            host:(NSString *)host
+                                          bucket:(NSString *)bucket
+                                       accessKey:(NSString *)accessKey
+                                       secretKey:(NSString *)secretKey
+                                         success:(void (^)(NSArray *newParts))success
+                                         failure:(void (^)(void))failure {
     
     if (index != 0) {
         [fileHandle seekToFileOffset:index * chunkSize];
@@ -384,19 +536,19 @@
         
         if (data.length == chunkSize) {
             
-            [weakSelf readAndUploadWithFileHandle:fileHandle
-                                        parts:parts
-                                    chunkSize:chunkSize
-                                        index:index+1
-                               fileNameBase64:fileNameBase64
-                                     uploadId:uploadId
-                                  uploadToken:uploadToken
-                                         host:host
-                                       bucket:bucket
-                                    accessKey:accessKey
-                                    secretKey:secretKey
-                                      success:success
-                                      failure:failure];
+            [weakSelf readAndUploadFileInPartialWithFileHandle:fileHandle
+                                                         parts:parts
+                                                     chunkSize:chunkSize
+                                                         index:index+1
+                                                fileNameBase64:fileNameBase64
+                                                      uploadId:uploadId
+                                                   uploadToken:uploadToken
+                                                          host:host
+                                                        bucket:bucket
+                                                     accessKey:accessKey
+                                                     secretKey:secretKey
+                                                       success:success
+                                                       failure:failure];
             
         } else {
             success ? success([parts copy]) : nil;
@@ -410,6 +562,7 @@
 }
 
 
+#pragma mark - init
 - (instancetype)init
 {
     self = [super init];

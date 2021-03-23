@@ -15,12 +15,12 @@
 {
     // Override point for customization after application launch.
     
-    NSString *Host = @"";
+    NSString *host = @"";
     NSString *bucket = @"";
     NSString *accessKey = @"";
     NSString *secretKey = @"";
 
-    [[KZLog sharedInstance] syncAllLogsToQiNiuWithHost:Host
+    [[KZLog sharedInstance] syncAllLogsToQiNiuWithHost:host
                                                 bucket:bucket
                                              accessKey:accessKey
                                              secretKey:secretKey];

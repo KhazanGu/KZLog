@@ -20,8 +20,8 @@
 #define KZ_UDID [[[UIDevice currentDevice] identifierForVendor] UUIDString]
 
 
-#define KZLOG(format, ...) ;
-//#define KZLOG(format, ...) printf("debug >>> %s %s\n", [[[NSDate date] description] UTF8String], [[NSString stringWithFormat:(format), ##__VA_ARGS__] UTF8String]);
+//#define KZLOG(format, ...) ;
+#define KZLOG(format, ...) printf("debug >>> %s %s\n", [[[NSDate date] description] UTF8String], [[NSString stringWithFormat:(format), ##__VA_ARGS__] UTF8String]);
 
 
 #endif /* KZLogConstants_h */
