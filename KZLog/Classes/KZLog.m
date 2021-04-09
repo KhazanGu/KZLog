@@ -39,28 +39,9 @@
                               bucket:bucket
                            accessKey:accessKey
                            secretKey:secretKey];
-    
-    
-    [self uploadViaDataWithFilePaths:files
-                           chunkSize:chunkSize
-                              format:format
-                                host:host
-                              bucket:bucket
-                           accessKey:accessKey
-                           secretKey:secretKey];
-
-
-    [self uploadViaPathWithFilePaths:files
-                           chunkSize:chunkSize
-                              format:format
-                                host:host
-                              bucket:bucket
-                           accessKey:accessKey
-                           secretKey:secretKey];
 }
 
-
-// upload full data files at the same time, big memory use.
+#pragma mark - upload full data files at the same time, big memory use.
 - (void)uploadViaDataWithFilePaths:(NSArray<NSString *> *)filePaths
                          chunkSize:(NSUInteger)chunkSize
                             format:(NSString *)format
@@ -91,7 +72,7 @@
     }];
 }
 
-// upload files at the same time, split one file data to parts, low memory use
+#pragma mark - upload files at the same time, split one file data to parts, low memory use
 - (void)uploadViaPathWithFilePaths:(NSArray<NSString *> *)filePaths
                          chunkSize:(NSUInteger)chunkSize
                             format:(NSString *)format
@@ -122,7 +103,7 @@
     }];
 }
 
-// upload file one by one, split one file data to parts, very low memory use
+#pragma mark - upload file one by one, split one file data to parts, very low memory use
 - (void)uploadViaPathWithFilePaths:(NSArray<NSString *> *)filePaths
                              index:(NSUInteger)index
                          chunkSize:(NSUInteger)chunkSize
@@ -209,7 +190,7 @@
 - (void)deleteFile:(NSString *)filePath {
     NSError *error;
     [[NSFileManager defaultManager] removeItemAtURL:[NSURL fileURLWithPath:filePath] error:&error];
-    KZLOG(@"uploaded:%@ error:%@", filePath, error);
+    KZLOG(@"deleteFile:%@ error:%@", filePath, error);
 }
 
 // file name on qiniu cloud
